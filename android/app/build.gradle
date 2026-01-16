@@ -2,6 +2,21 @@ apply plugin: "com.android.application"
 apply plugin: "org.jetbrains.kotlin.android"
 apply plugin: "com.facebook.react"
 
+
+Project background_geolocation = project(':react-native-background-geolocation')
+apply from: "${background_geolocation.projectDir}/app.gradle"
+
+project.ext.envFile = rootProject.file(".env")
+
+if (project.ext.envFile.exists()) {
+    project.ext.envFile.eachLine { line ->
+        if (line && line.contains("=")) {
+            def (key, value) = line.tokenize('=')
+            project.ext.set(key.trim(), value.trim())
+        }
+    }
+}
+
 /**
  * This is the configuration block to customize your React Native Android app.
  * By default you don't need to apply any configuration, just uncomment the lines you need.
@@ -84,6 +99,9 @@ android {
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1
         versionName "1.0"
+        manifestPlaceholders = [
+            GOOGLE_MAPS_API_KEY: project.ext.has("GOOGLE_MAPS_API_KEY") ? project.ext.get("GOOGLE_MAPS_API_KEY") : ""
+        ]
     }
     signingConfigs {
         debug {
@@ -103,6 +121,7 @@ android {
             signingConfig signingConfigs.debug
             minifyEnabled enableProguardInReleaseBuilds
             proguardFiles getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro"
+            shrinkResources false
         }
     }
 }
@@ -116,4 +135,5 @@ dependencies {
     } else {
         implementation jscFlavor
     }
+    implementation "com.google.android.gms:play-services-location:21.3.0"
 }

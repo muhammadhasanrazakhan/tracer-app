@@ -6,15 +6,35 @@ buildscript {
         targetSdkVersion = 36
         ndkVersion = "27.1.12297006"
         kotlinVersion = "2.1.20"
+        googlePlayServicesLocationVersion = "21.3.0"
     }
     repositories {
         google()
-        mavenCentral()
+        mavenCentral()     
     }
     dependencies {
         classpath("com.android.tools.build:gradle")
         classpath("com.facebook.react:react-native-gradle-plugin")
         classpath("org.jetbrains.kotlin:kotlin-gradle-plugin")
+    }
+}
+
+allprojects {
+    repositories {
+        google()
+        mavenCentral()
+        // Required for react-native-background-geolocation
+        maven { url("${project(':react-native-background-geolocation').projectDir}/libs") }
+        // Required for react-native-background-fetch
+        maven { url("${project(':react-native-background-fetch').projectDir}/libs") }
+    }
+
+    configurations.all {
+        resolutionStrategy {
+            force "com.google.android.gms:play-services-location:21.3.0"
+            force "com.google.android.gms:play-services-base:18.5.0"
+            force "com.google.android.gms:play-services-tasks:18.0.2"
+        }
     }
 }
 
